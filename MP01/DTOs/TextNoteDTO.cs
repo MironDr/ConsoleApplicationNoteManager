@@ -1,7 +1,13 @@
-﻿namespace MP01.DTOs;
+﻿using System.Text.Json;
+using SQLite;
+
+namespace MP01.DTOs;
 
 public class TextNoteDTO : NoteDTO
 {
-    public string Content { get; set; }
+
     
+    public List<string> Content = new();
+
+
 }

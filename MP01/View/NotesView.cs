@@ -55,21 +55,28 @@ public class NotesView
     
     public void CreateTextNoteFromView()
     {
-        
         NoteDTO noteDTO = CreateNoteFromView();
-        
-        Console.WriteLine("Enter the content of the note:");
-        string content = Console.ReadLine() ?? string.Empty;
+
+        List<string> contentList = new List<string>();
+        Console.WriteLine("Enter the content of the note (leave empty to finish):");
+
+        while (true)
+        {
+            string content = Console.ReadLine()?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(content))
+                break; 
+
+            contentList.Add(content);
+        }
 
         TextNoteDTO textNoteDto = new TextNoteDTO
         {
             Title = noteDTO.Title,
             Description = noteDTO.Description,
-            Content = content
+            Content = contentList
         };
-        
+
         _noteService.AddNote(textNoteDto);
-        
     }
 
     public void CompleteNote(NoteModel note)
@@ -117,7 +124,7 @@ public class NotesView
     public NoteModel? GetNoteFromView()
     {
         
-        List<NoteModel?> notes = _noteService.GetNotes();
+        List<NoteModel?> notes = _noteService.GetAllNotes();
         
         if(notes.Count == 0)
             return null;
@@ -127,7 +134,7 @@ public class NotesView
         
         for(int i = 0; i < notes.Count; i++)
         {
-            Console.WriteLine($"{i+1}. {NoteToStringList(notes[i])}\n");
+            Console.WriteLine($"{i+1}. {NoteToStringList((NoteModel)notes[i])}\n");
         }
         
         Console.WriteLine("Choose a note:");
@@ -153,7 +160,7 @@ public class NotesView
     }
 
 
-    private string NoteToStringList(dynamic note)
+    private string NoteToStringList(NoteModel note)
     {
         return NoteToStringListImpl(note);
     }
@@ -163,10 +170,6 @@ public class NotesView
         return $"Tittle: {note.Title}, Description: {note.Description}, CreatedAt: {note.CreatedAt}";
     }
     
-    private string NoteToStringListImpl(TextNoteModel? note)
-    {
-        return $"{NoteToStringListImpl((NoteModel)note)}, Content: {note.Content}";
-    }
     
     
     private string NoteToString(dynamic note)
@@ -197,7 +200,14 @@ public class NotesView
     {
         StringBuilder stringBuilder = new StringBuilder(NoteToStringImpl((NoteModel)note));
         
-        stringBuilder.Append($"Content: {note.Content}\n");
+        stringBuilder.Append("<<<<<<Text Blocks>>>>>>\n");
+        
+        foreach (string str in note.Content)
+        {
+            stringBuilder.Append("---------------------\n");
+            stringBuilder.Append($"{str}\n");
+        }
+    
         
         return stringBuilder.ToString();
     }

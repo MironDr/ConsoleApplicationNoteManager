@@ -8,6 +8,8 @@ using MP01.View;
 
 var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "dbnote.sqlite");
 
+//Register NotesTypeManager
+ServiceLocator.Register(new NotesTypeManager());
 
 //Register DB
 ServiceLocator.Register(new AppDbContext(dbPath));
@@ -28,7 +30,7 @@ static void Main()
 
         while (true)
         {
-            //Console.Clear();
+            Console.Clear();
             Console.WriteLine("Select an action:");
             Console.WriteLine("1 - Create a category");
             Console.WriteLine("2 - Create a note");

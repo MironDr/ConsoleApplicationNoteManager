@@ -1,4 +1,5 @@
 ﻿using MP01.Models;
+using MP01.Utilities;
 using SQLite;
 
 namespace MP01.Context;
@@ -6,21 +7,17 @@ namespace MP01.Context;
 public class AppDbContext
 {
     private readonly SQLiteConnection _connection;
-    private readonly List<Type> _noteTypes = new();
+    private readonly List<Type> _noteTypes;
     public AppDbContext(string dbPath)
     {
         _connection = new SQLiteConnection(dbPath);
         _connection.CreateTable<CategoryModel>();
-        
-        RegisterNoteTypes();
+
+        _noteTypes = ServiceLocator.Get<NotesTypeManager>().GetNoteTypes();
         CreateTables();
     }
     
-    private void RegisterNoteTypes()
-    {
-        _noteTypes.Add(typeof(TextNoteModel));
-        
-    }
+   
     
     private void CreateTables()
     {
@@ -31,30 +28,7 @@ public class AppDbContext
     }
 
  
-    public List<NoteModel?> GetAllNotesBase()
-    {
-        var notes = new List<NoteModel?>();
-
-        foreach (var noteType in _noteTypes)
-        {
-            var method = typeof(AppDbContext).GetMethod(nameof(GetAllOfType))?.MakeGenericMethod(noteType);
-        
-            if (method != null)
-            {
-                
-                var result = method.Invoke(this, null);
-
-                if (result is IEnumerable<NoteModel> noteList)
-                {
-
-                    notes.AddRange(noteList.Cast<NoteModel?>());
-
-                }
-            }
-        }
-
-        return notes;
-    }
+    
     public void Add<T>(T entity) where T : new()
     {
         _connection.Insert(entity);
